@@ -9,9 +9,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
-import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import HongZe.MyChatRoom.entity.User;
 
+@Component
 public class ChatHandler extends TextWebSocketHandler {
 	Logger logger = LoggerFactory.getLogger(getClass());
 	private Map<String, WebSocketSession> clients = new ConcurrentHashMap<String, WebSocketSession>();
@@ -29,9 +30,17 @@ public class ChatHandler extends TextWebSocketHandler {
 	ObjectMapper objectMapper;
 
 	@Override
-	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
+	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		// TODO Auto-generated method stub
-		super.handleMessage(session, message);
+		String s = message.getPayload().strip();
+		if (s.isEmpty()) {
+			return;
+		}
+		String name = (String) session.getAttributes().get("name");
+		ChatText chatText = objectMapper.readValue(s, ChatText.class);
+		var msg = new ChatMessage(name, chatText.text);
+		chatHistory.addToHistoryChatMessages(msg);
+		broadcast(msg);
 	}
 
 	@Override
@@ -71,7 +80,6 @@ public class ChatHandler extends TextWebSocketHandler {
 	}
 
 	private String initGuestName() {
-		// TODO Auto-generated method stub
 		return "Guest" + guestNumber.incrementAndGet();
 	}
 
@@ -79,7 +87,6 @@ public class ChatHandler extends TextWebSocketHandler {
 
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-		// TODO Auto-generated method stub
 		clients.remove(session.getId());
 		logger.info("websocket connection closed: id = {}, close-status = {}", session.getId(), status);
 	}

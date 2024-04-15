@@ -1,8 +1,7 @@
 package HongZe.MyChatRoom.web;
 
-public class ChatMessage {
+public class ChatMessage extends ChatText {
 	public String name;
-	public String text;
 	public long timestamp;
 
 	public ChatMessage(String name, String text) {
@@ -16,4 +15,8 @@ public class ChatMessage {
 		// TODO Auto-generated constructor stub
 	}
 
+}
+
+class ChatText {
+	public String text;
 }

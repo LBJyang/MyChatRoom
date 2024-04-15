@@ -3,6 +3,11 @@
  */
 package HongZe.MyChatRoom.entity;
 
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -51,5 +56,15 @@ public class User extends AbstractEntity {
 	public String toString() {
 		return String.format("User[id=%s, email=%s, name=%s, password=%s, createdDateTime=%s]", getId(), getEmail(),
 				getName(), getPassword(), getCreatedDateTime());
+	}
+
+	public String getImageUrl() {
+		try {
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			byte[] hash = md.digest(this.email.trim().toLowerCase().getBytes(StandardCharsets.UTF_8));
+			return "https://www.gravatar.com/avatar/" + String.format("%032x", new BigInteger(1, hash));
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

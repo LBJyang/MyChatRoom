@@ -30,10 +30,17 @@ public class UserController {
 		return new ModelAndView("500.html", Map.of("error", ex.getClass().getSimpleName(), "message", ex.getMessage()));
 	}
 
+	/*
+	 * @GetMapping("/") public ModelAndView index(HttpSession httpSession) { User
+	 * user = (User) httpSession.getAttribute(KEY_USER); Map<String, User> model =
+	 * new HashMap<String, User>(); if (user != null) { model.put(user.getName(),
+	 * user); } return new ModelAndView("index.html", model); }
+	 */
+	
 	@GetMapping("/")
-	public ModelAndView index(HttpSession httpSession) {
-		User user = (User) httpSession.getAttribute(KEY_USER);
-		Map<String, User> model = new HashMap<String, User>();
+	public ModelAndView index(HttpSession session) {
+		User user = (User) session.getAttribute(KEY_USER);
+		Map<String, Object> model = new HashMap<>();
 		if (user != null) {
 			model.put(user.getName(), user);
 		}
